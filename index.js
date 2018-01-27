@@ -53,9 +53,10 @@ var Scroller = (function () {
    * @param {callback} action.method - The method to fire
    */
   function ScrollAction (element, action) {
-    if (element instanceof jQuery || element instanceof NodeList) {
+    if (!typeof jQuery === 'undefined' && element instanceof jQuery) {
       this.element = element[0]
-    } else {
+    }
+    if (element instanceof NodeList) {
       this.element = element
     }
     this.actionName = action.name
