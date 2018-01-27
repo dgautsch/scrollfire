@@ -1,0 +1,32 @@
+{
+  "name": "scrollfire",
+  "version": "1.0.0",
+  "description": "Fire functions at set positions in the browser window as you scroll.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dgautsch/scrollfire.git"
+  },
+  "keywords": [
+    "JavaScript",
+    "Node"
+  ],
+  "author": "Dan Gautsch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dgautsch/scrollfire/issues"
+  },
+  "homepage": "https://github.com/dgautsch/scrollfire#readme",
+  "dependencies": {
+    "standard": "^10.0.3"
+  },
+  "standard": {
+    "env": {
+      "browser": true,
+      "jquery": true
+    }
+  }
+}
