@@ -17,3 +17,8 @@ You can also remove actions later on if for some reason you don't want them to r
   scrollfire.removeAction('actionName') // i.e. myName
 ```
 
+Then initialize scrollfire
+
+```javascript
+  scrollfire.init()
+```

@@ -1,4 +1,4 @@
-var Scroller = (function () {
+var Scrollfire = (function () {
   /**
    * Polyfill for CustomEvent on IE9+
    * https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent#Polyfill
@@ -55,8 +55,9 @@ var Scroller = (function () {
   function ScrollAction (element, action) {
     if (!typeof jQuery === 'undefined' && element instanceof jQuery) {
       this.element = element[0]
-    }
-    if (element instanceof NodeList) {
+    } else if (element instanceof NodeList) {
+      this.element = element
+    } else {
       this.element = element
     }
     this.actionName = action.name
@@ -151,7 +152,7 @@ var Scroller = (function () {
   }
 
   /**
-   * init - initializes the scroller module
+   * init - initializes the Scrollfire module
    *
    */
   function init () {
@@ -166,4 +167,4 @@ var Scroller = (function () {
   }
 })()
 
-module.exports = Scroller
+module.exports = Scrollfire
