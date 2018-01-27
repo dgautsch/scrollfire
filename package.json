@@ -1,6 +1,6 @@
 {
   "name": "scrollfire",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Fire functions at set positions in the browser window as you scroll.",
   "main": "index.js",
   "repository": {
