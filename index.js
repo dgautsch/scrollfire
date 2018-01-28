@@ -19,6 +19,7 @@ var Scrollfire = (function () {
   })()
 
   var actionQueue = []
+  var initialized = false
 
   /**
    * scrollActionAdd - Creates a custom event to add a ScrollAction
@@ -52,7 +53,13 @@ var Scrollfire = (function () {
    * @param {string} action.name - The name of the action
    * @param {callback} action.method - The method to fire
    */
-  function ScrollAction (element, action) {
+  function ScrollAction (element, config) {
+    if (!config.name) {
+      throw new Error('You must specify a config.name.')
+    }
+    if (!config.method) {
+      throw new Error('You must specify a config.method to fire.')
+    }
     if (!typeof jQuery === 'undefined' && element instanceof jQuery) {
       this.element = element[0]
     } else if (element instanceof NodeList) {
@@ -60,8 +67,9 @@ var Scrollfire = (function () {
     } else {
       this.element = element
     }
-    this.actionName = action.name
-    this.actionMethod = action.method
+    this.actionName = config.name
+    this.actionMethod = config.method || function () {}
+    this.persist = config.persist || false
     this.hasFired = false
   }
 
@@ -69,12 +77,13 @@ var Scrollfire = (function () {
    * addAction -Adds an action to the action queue
    *
    * @param {Object} elem - A DOM element or jQuery element object
-   * @param {Object} action - An object with the action parameters
-   * @param {string} action.name - The name of the action
-   * @param {callback} action.method - The method to fire
+   * @param {Object} config - An object with the action parameters
+   * @param {string} config.name - The name of the action
+   * @param {callback} config.method - The method to fire
    */
-  function addAction (elem, action) {
-    var taskAction = new ScrollAction(elem, action)
+  function addAction (elem, config) {
+    if (!initialized) throw new Error('Scrollfire has not been initialized, you must call scrollfire.init()')
+    var taskAction = new ScrollAction(elem, config)
     document.dispatchEvent(scrollActionAdd(taskAction))
   }
 
@@ -115,7 +124,9 @@ var Scrollfire = (function () {
         if (elem.element) {
           var elemTop = elem.element.getBoundingClientRect().top
           if (elemTop >= viewportTop && elemTop <= viewportBottom && !elem.hasFired) {
-            elem.hasFired = true // only fire the animation once
+            if (!elem.persist) {
+              elem.hasFired = true // only fire the animation once
+            }
             elem.actionMethod()
           }
         }
@@ -138,8 +149,8 @@ var Scrollfire = (function () {
   function debounce (func, wait, immediate) {
     var timeout
     return function () {
-      var context = this;
-      var args = arguments;
+      var context = this
+      var args = arguments
       var later = function () {
         timeout = null
         if (!immediate) func.apply(context, args)
@@ -156,6 +167,12 @@ var Scrollfire = (function () {
    *
    */
   function init () {
+    if (!initialized) {
+      initialized = true
+    } else {
+      console.warn('Scrollfire has already been initialized')
+      return
+    }
     actionController()
     scrollWatch()
   }
