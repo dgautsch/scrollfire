@@ -1,4 +1,5 @@
 # Scrollfire
+[![Known Vulnerabilities](https://snyk.io/test/github/dgautsch/scrollfire/badge.svg?targetFile=package.json)](https://snyk.io/test/github/dgautsch/scrollfire?targetFile=package.json) [![npm version](https://badge.fury.io/js/scrollfire.svg)](https://badge.fury.io/js/scrollfire)
 
 Scrollfire allows you to set functions that will fire when specific DOM elements of your website come into a user's viewport. A typical use case would be an animation that needs to fire when the element comes into view.
 
