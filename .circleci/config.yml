@@ -1,0 +1,22 @@
+version: 2
+executorType: docker
+containerInfo:
+  - image: node:8
+jobs:
+  build:
+    workDir: ~/scrollfire
+    steps:
+      - type: checkout
+      - type: cache-restore
+        key: scrollfire-{{checksum "package.json"}}
+      - run: |
+          set -x
+          node -v
+          npm i
+          npm test
+          ./node_modules/.bin/standard
+      - type: cache-save
+        key: cli-engine-{{checksum "package.json"}}
+        paths:
+          - /usr/local/share/.cache/npm
+          - ~/scrollfire/node_modules
