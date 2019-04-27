@@ -1,3 +1,8 @@
+/**
+ * Scrollfire
+ * @module Scrollfire
+ *
+ */
 var Scrollfire = (function () {
   /**
    * Polyfill for CustomEvent on IE9+
@@ -18,12 +23,13 @@ var Scrollfire = (function () {
     window.CustomEvent = CustomEvent
   })()
 
-  var actionQueue = []
+  var actionStore = []
   var initialized = false
 
   /**
    * scrollActionAdd - Creates a custom event to add a ScrollAction
    *
+   * @param {Object} scrollAction - The scroll action object
    * @returns {event} scrollActionAdd event
    */
   function scrollActionAdd (scrollAction) {
@@ -35,6 +41,7 @@ var Scrollfire = (function () {
   /**
    * scrollActionRemove - Creates a custom event to remove a ScrollAction
    *
+   * @param {string} actionName - The action name to remove
    * @returns {event} scrollActionRemove event
    */
   function scrollActionRemove (actionName) {
@@ -48,10 +55,10 @@ var Scrollfire = (function () {
    *
    * @type constructor
    *
-   * @param {object} element - A DOM element or jQuery element object
-   * @param {object} action - action - An object with the action parameters
-   * @param {string} action.name - The name of the action
-   * @param {callback} action.method - The method to fire
+   * @param {Object} element - A DOM element or jQuery element object
+   * @param {Object} config - config - An object with the config parameters
+   * @param {string} config.name - The name of the config
+   * @param {callback} config.method - The method to fire
    */
   function ScrollAction (element, config) {
     if (!config.name) {
@@ -79,7 +86,8 @@ var Scrollfire = (function () {
    * @param {Object} elem - A DOM element or jQuery element object
    * @param {Object} config - An object with the action parameters
    * @param {string} config.name - The name of the action
-   * @param {callback} config.method - The method to fire
+   * @param {function} config.method - The method to fire
+   * @param {boolean} config.persist - True to fire action endlessly
    */
   function addAction (elem, config) {
     if (!initialized) throw new Error('Scrollfire has not been initialized, you must call scrollfire.init()')
@@ -90,39 +98,39 @@ var Scrollfire = (function () {
   /**
    * removeAction - Removes an action from the action queue
    *
-   * @param {string} actionMethodName - The name of the action to remove
+   * @param {string} actionName - The name of the action to remove
    */
   function removeAction (actionName) {
+    if (!initialized) throw new Error('Scrollfire has not been initialized, you must call scrollfire.init()')
     document.dispatchEvent(scrollActionRemove(actionName))
-  }
-
-  function actionController () {
-    document.addEventListener('scrollActionAdd', function (e) {
-      var data = e.detail
-      actionQueue.push(data)
-    })
-
-    document.addEventListener('scrollActionRemove', function (e) {
-      var data = e.detail
-      actionQueue.find(function (elem, idx, arr) {
-        if (elem.actionName === data) {
-          arr.splice(idx, 1)
-        }
-      })
-    })
   }
 
   /**
    * scrollWatch - Watches for scroll events and checks the y position
    *
    */
-  function scrollWatch () {
-    var viewportWatch = debounce(function () {
-      var viewportTop = window.innerHeight * 0.3
-      var viewportBottom = window.innerHeight * 0.6
-      actionQueue.find(function (elem) {
+  function bootstrap (config) {
+    document.addEventListener('scrollActionAdd', function (e) {
+      var data = e.detail
+      actionStore.push(data)
+    })
+
+    document.addEventListener('scrollActionRemove', function (e) {
+      var data = e.detail
+      actionStore.find(function (elem, idx, arr) {
+        if (elem.actionName === data) {
+          arr.splice(idx, 1)
+        }
+      })
+    })
+
+    window.addEventListener('scroll', debounce(function () {
+      const viewportTop = window.innerHeight * config.viewportTop
+      const viewportBottom = window.innerHeight * config.viewportBottom
+
+      actionStore.find(function (elem) {
         if (elem.element) {
-          var elemTop = elem.element.getBoundingClientRect().top
+          const elemTop = elem.element.getBoundingClientRect().top
           if (elemTop >= viewportTop && elemTop <= viewportBottom && !elem.hasFired) {
             if (!elem.persist) {
               elem.hasFired = true // only fire the animation once
@@ -131,8 +139,7 @@ var Scrollfire = (function () {
           }
         }
       })
-    }, 10, true)
-    window.addEventListener('scroll', viewportWatch)
+    }, 10, true))
   }
 
   /**
@@ -166,15 +173,19 @@ var Scrollfire = (function () {
    * init - initializes the Scrollfire module
    *
    */
-  function init () {
+  function init (config) {
+    const defaults = Object.assign({}, {
+      viewportTop: 0.3,
+      viewportBottom: 0.6
+    }, config)
+
     if (!initialized) {
       initialized = true
     } else {
       console.warn('Scrollfire has already been initialized')
       return
     }
-    actionController()
-    scrollWatch()
+    bootstrap(defaults)
   }
 
   return {
@@ -184,4 +195,8 @@ var Scrollfire = (function () {
   }
 })()
 
-module.exports = Scrollfire
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = Scrollfire
+} else {
+  window.Scrollfire = Scrollfire
+}
