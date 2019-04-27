@@ -27,8 +27,8 @@ var Scrollfire = (function () {
    * An array of actions created
    *
    */
-  var actionStore = []
-  var initialized = false
+  const actionStore = []
+  let initialized = false
 
   /**
    * scrollActionAdd - Creates a custom event to add a ScrollAction
@@ -95,7 +95,7 @@ var Scrollfire = (function () {
    */
   function addAction (elem, config) {
     if (!initialized) throw new Error('Scrollfire has not been initialized, you must call scrollfire.init()')
-    var taskAction = new ScrollAction(elem, config)
+    const taskAction = new ScrollAction(elem, config)
     document.dispatchEvent(scrollActionAdd(taskAction))
   }
 
@@ -115,15 +115,14 @@ var Scrollfire = (function () {
    */
   function bootstrap (config) {
     document.addEventListener('scrollActionAdd', function (e) {
-      var data = e.detail
+      const data = e.detail
       actionStore.push(data)
     })
 
     document.addEventListener('scrollActionRemove', function (e) {
-      var data = e.detail
+      const data = e.detail
       actionStore.forEach(function (elem, idx, arr) {
         if (!elem || !elem.hasOwnProperty('actionName')) return
-        debugger;
         if (elem.actionName === data) {
           arr.splice(idx, 1)
         }
@@ -160,15 +159,15 @@ var Scrollfire = (function () {
    * @return {function}
    */
   function debounce (func, wait, immediate) {
-    var timeout
+    let timeout
     return function () {
-      var context = this
-      var args = arguments
-      var later = function () {
+      const context = this
+      const args = arguments
+      const later = function () {
         timeout = null
         if (!immediate) func.apply(context, args)
       }
-      var callNow = immediate && !timeout
+      const callNow = immediate && !timeout
       clearTimeout(timeout)
       timeout = setTimeout(later, wait)
       if (callNow) func.apply(context, args)
