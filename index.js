@@ -23,6 +23,10 @@ var Scrollfire = (function () {
     window.CustomEvent = CustomEvent
   })()
 
+  /**
+   * An array of actions created
+   *
+   */
   var actionStore = []
   var initialized = false
 
@@ -117,7 +121,9 @@ var Scrollfire = (function () {
 
     document.addEventListener('scrollActionRemove', function (e) {
       var data = e.detail
-      actionStore.find(function (elem, idx, arr) {
+      actionStore.forEach(function (elem, idx, arr) {
+        if (!elem || !elem.hasOwnProperty('actionName')) return
+        debugger;
         if (elem.actionName === data) {
           arr.splice(idx, 1)
         }
@@ -189,6 +195,7 @@ var Scrollfire = (function () {
   }
 
   return {
+    actionStore: actionStore,
     addAction: addAction,
     removeAction: removeAction,
     init: init
