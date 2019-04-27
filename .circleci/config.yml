@@ -2,7 +2,7 @@ version: 2
 executorType: docker
 containerInfo:
   - image: node:8
-stages:
+jobs:
   build:
     workDir: ~/scrollfire
     steps:
